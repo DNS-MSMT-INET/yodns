@@ -8,12 +8,12 @@ on:
   push:
     branches:
       - "*"
-  
+
   paths:
-      - 'client/**'
-      - 'resolver/**'
-      - 'yodns/**'
-      - '.github/workflows/yodns_ci.yml'
+    - 'client/**'
+    - 'resolver/**'
+    - 'yodns/**'
+    - '.github/workflows/yodns_ci.yml'
 
 
 jobs:
