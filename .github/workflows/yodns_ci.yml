@@ -4,17 +4,21 @@ on:
   pull_request:
     branches:
       - "*"
+    paths:
+      - 'client/**'
+      - 'resolver/**'
+      - 'yodns/**'
+      - '.github/workflows/yodns_ci.yml'
+
 
   push:
     branches:
       - "*"
-
-  paths:
-    - 'client/**'
-    - 'resolver/**'
-    - 'yodns/**'
-    - '.github/workflows/yodns_ci.yml'
-
+    paths:
+      - 'client/**'
+      - 'resolver/**'
+      - 'yodns/**'
+      - '.github/workflows/yodns_ci.yml'
 
 jobs:
   code-style:
