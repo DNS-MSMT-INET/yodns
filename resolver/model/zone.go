@@ -2,13 +2,14 @@ package model
 
 import (
 	"fmt"
-	"github.com/miekg/dns"
-	"github.com/DNS-MSMT-INET/yodns/resolver/common"
-	"golang.org/x/exp/slices"
 	"hash/fnv"
 	"math/rand"
 	"strconv"
 	"strings"
+
+	"github.com/DNS-MSMT-INET/yodns/resolver/common"
+	"github.com/miekg/dns"
+	"golang.org/x/exp/slices"
 )
 
 // Zone represents a DNS zone
@@ -52,6 +53,14 @@ func (zone *Zone) GoToRoot() *Zone {
 func (zone *Zone) OnNameServerAdded(key any, callback func(ns *NameServer)) {
 	zone.onNameServerAdded[key] = callback
 }
+
+func (zone *Zone) OnNameServerAddedOnce(key any, callback func(ns *NameServer)) {
+	zone.onNameServerAdded[key] = func(ns *NameServer) {
+		callback(ns)
+		delete(zone.onNameServerAdded, key)
+	}
+}
+
 
 // GetRecords returns all the distinct resource records that could be retrieved for the zone.
 // It can be expensive, use with care.
