@@ -51,6 +51,10 @@ func (*doNotScanListWrapper) FromReader(r io.Reader) error {
 			continue
 		}
 
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+
 		if subnetRegex.Match([]byte(line)) {
 			if err := result.AddPrefix(line); err != nil {
 				return err
