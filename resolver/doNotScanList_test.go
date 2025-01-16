@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
+	"github.com/zmap/go-iptree/iptree"
 	"net/netip"
 	"strings"
 	"testing"
@@ -9,35 +10,29 @@ import (
 )
 
 func Test_doNotScanListWrapper_LoadFromReader(t *testing.T) {
-	input := strings.NewReader("IP,192.0.2.1,withsomecomment" +
-		"\nIP,2001:db8:fff::1," +
-		"\nPREFIX,2001:db8::/64," +
-		"\nPREFIX,198.51.100.0/24," +
-		"\nDN,example.com,anothercomment")
+	input := strings.NewReader(
+		"# Comment\n" +
+			"2001:db8::/64\n" +
+			"198.51.100.0/24\n" +
+			"example.com")
 
 	if err := DoNotScanList.FromReader(input); err != nil {
 		t.Errorf("doNotScanListWrapper.FromReader() error = %v", err)
 	}
-	if _, ok := DoNotScanList.ips[netip.MustParseAddr("192.0.2.1")]; !ok {
-		t.Errorf("Expected IPv4 to be loaded")
-	}
-	if _, ok := DoNotScanList.ips[netip.MustParseAddr("2001:db8:fff::1")]; !ok {
-		t.Errorf("Expected IPv6 to be loaded")
-	}
 	if _, ok := DoNotScanList.names["example.com."]; !ok {
 		t.Errorf("Expected Domainname to be loaded")
 	}
-	if _, ok := DoNotScanList.nets[netip.MustParsePrefix("198.51.100.0/24")]; !ok {
+	if _, ok, err := DoNotScanList.nets.GetByString("198.51.100.0/24"); !ok || err != nil {
 		t.Errorf("Expected IPv4 prefix to be loaded")
 	}
-	if _, ok := DoNotScanList.nets[netip.MustParsePrefix("2001:db8:0::/64")]; !ok {
+	if _, ok, err := DoNotScanList.nets.GetByString("2001:db8:0::/64"); !ok || err != nil {
 		t.Errorf("Expected IPv6 prefix to be loaded")
 	}
 }
 
 func Test_doNotScanListWrapper_CanReload(t *testing.T) {
-	input := strings.NewReader("DN,example.com")
-	input2 := strings.NewReader("DN,example.org")
+	input := strings.NewReader("example.com")
+	input2 := strings.NewReader("example.org")
 
 	if err := DoNotScanList.FromReader(input); err != nil {
 		t.Errorf("doNotScanListWrapper.FromReader() error = %v", err)
@@ -62,65 +57,9 @@ func Test_doNotScanListWrapper_CanReload(t *testing.T) {
 	}
 }
 
-func Test_doNotScanListWrapper_MustNotScanIP_ExpectTrue(t *testing.T) {
-	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
-		names: make(map[model.DomainName]int),
-	}
-
-	list.AddIP(netip.MustParseAddr("1.2.3.4"))
-	mustNotScan := list.MustNotScan(model.Question{}, "", netip.MustParseAddr("1.2.3.4"))
-
-	if !mustNotScan {
-		t.Errorf("doNotScanListWrapper.MustNotScan() got = %v, want true", mustNotScan)
-	}
-}
-
-func Test_doNotScanListWrapper_MustNotScanIP_ExpectFalse(t *testing.T) {
-	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
-		names: make(map[model.DomainName]int),
-	}
-
-	list.AddIP(netip.MustParseAddr("4.3.2.1"))
-	mustNotScan := list.MustNotScan(model.Question{}, "", netip.MustParseAddr("1.2.3.4"))
-
-	if mustNotScan {
-		t.Errorf("doNotScanListWrapper.MustNotScan() got = %v, want false", mustNotScan)
-	}
-}
-
-func Test_doNotScanListWrapper_MustNotScanIP_EquivalentIPsWithDifferentFormat_ExpectTrue(t *testing.T) {
-	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
-		names: make(map[model.DomainName]int),
-	}
-
-	list.AddIP(netip.MustParseAddr("ffff::1111"))
-	mustNotScan := list.MustNotScan(model.Question{}, "", netip.MustParseAddr("FFFF:0000:0000::1111"))
-
-	if !mustNotScan {
-		t.Errorf("doNotScanListWrapper.MustNotScan() got = %v, want false", mustNotScan)
-	}
-}
-
-func Test_doNotScanListWrapper_MustNotScanIP_IPEqualToDomainName_ExpectFalse(t *testing.T) {
-	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
-		names: make(map[model.DomainName]int),
-	}
-
-	list.AddDomainName("1.2.3.4")
-	mustNotScan := list.MustNotScan(model.Question{}, "", netip.MustParseAddr("1.2.3.4"))
-
-	if mustNotScan {
-		t.Errorf("doNotScanListWrapper.MustNotScan() got = %v, want false", mustNotScan)
-	}
-}
-
 func Test_doNotScanListWrapper_MustNotScanDomainName_ExpectTrue(t *testing.T) {
 	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
+		nets:  iptree.New(),
 		names: make(map[model.DomainName]int),
 	}
 
@@ -138,7 +77,7 @@ func Test_doNotScanListWrapper_MustNotScanDomainName_ExpectTrue(t *testing.T) {
 
 func Test_doNotScanListWrapper_MustNotScanNsName_ExpectTrue(t *testing.T) {
 	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
+		nets:  iptree.New(),
 		names: make(map[model.DomainName]int),
 	}
 
@@ -152,11 +91,11 @@ func Test_doNotScanListWrapper_MustNotScanNsName_ExpectTrue(t *testing.T) {
 
 func Test_doNotScanListWrapper_MustNotScanDomainName_ExpectFalse(t *testing.T) {
 	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
+		nets:  iptree.New(),
 		names: make(map[model.DomainName]int),
 	}
 
-	list.AddIP(netip.MustParseAddr("1.2.3.4"))
+	list.AddPrefix("1.2.3.4")
 	mustNotScan := list.MustNotScan(model.Question{}, "1.2.3.4", netip.Addr{})
 
 	if mustNotScan {
@@ -166,12 +105,11 @@ func Test_doNotScanListWrapper_MustNotScanDomainName_ExpectFalse(t *testing.T) {
 
 func Test_doNotScanListWrapper_MustNotScanPrefix_ExpectTrue(t *testing.T) {
 	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
 		names: make(map[model.DomainName]int),
-		nets:  make(map[netip.Prefix]int),
+		nets:  iptree.New(),
 	}
 
-	list.AddPrefix(netip.MustParsePrefix("192.0.2.0/24"))
+	list.AddPrefix("192.0.2.0/24")
 
 	mustNotScan := list.MustNotScan(model.Question{}, "", netip.MustParseAddr("192.0.2.123"))
 
@@ -180,14 +118,13 @@ func Test_doNotScanListWrapper_MustNotScanPrefix_ExpectTrue(t *testing.T) {
 	}
 }
 
-func Test_doNotScanListWrapper_MustNotScanPrefix_ExpectFalse(t *testing.T) {
+func Test_doNotScanListWrapper_MustNotScanPrefixIPv4_ExpectFalse(t *testing.T) {
 	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
 		names: make(map[model.DomainName]int),
-		nets:  make(map[netip.Prefix]int),
+		nets:  iptree.New(),
 	}
 
-	list.AddPrefix(netip.MustParsePrefix("192.0.2.0/24"))
+	list.AddPrefix("192.0.2.0/24")
 
 	if list.MustNotScan(model.Question{}, "", netip.MustParseAddr("192.0.1.254")) {
 		t.Errorf("doNotScanListWrapper.MustNotScan() got = true, want false")
@@ -197,15 +134,28 @@ func Test_doNotScanListWrapper_MustNotScanPrefix_ExpectFalse(t *testing.T) {
 	}
 }
 
+func Test_doNotScanListWrapper_MustNotScanPrefixIPv6_ExpectFalse(t *testing.T) {
+	list := doNotScanListWrapper{
+		names: make(map[model.DomainName]int),
+		nets:  iptree.New(),
+	}
+
+	list.AddPrefix("2001:db8::0/48")
+
+	if list.MustNotScan(model.Question{}, "", netip.MustParseAddr("2001:db9::0")) {
+		t.Errorf("doNotScanListWrapper.MustNotScan() got = true, want false")
+	}
+}
+
 func Test_doNotScanListWrapper_MustNotScan(t *testing.T) {
 	list := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
+		nets:  iptree.New(),
 		names: make(map[model.DomainName]int),
 	}
 
 	list.AddDomainName("must.not.scan.")
-	list.AddIP(netip.MustParseAddr("1.2.3.4"))
-	list.AddIP(netip.MustParseAddr("FFFF::FFFF"))
+	list.AddPrefix("1.2.3.4/32")
+	list.AddPrefix("FFFF::FFFF/128")
 
 	type args struct {
 		label  model.DomainName
