@@ -1,29 +1,30 @@
 package resolver
 
 import (
-	"encoding/csv"
+	"bufio"
 	"fmt"
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
+	"github.com/zmap/go-iptree/iptree"
 	"io"
-	"net"
 	"net/netip"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 )
 
 var doNotScanMu sync.RWMutex
 
+var subnetRegex = regexp.MustCompile(".+/\\d{1,3}")
+
 // DoNotScanList is the list of all IPs and domain names which are exempt from scanning.
 var DoNotScanList = doNotScanListWrapper{
-	ips:   make(map[netip.Addr]int),
-	nets:  make(map[netip.Prefix]int),
+	nets:  iptree.New(),
 	names: make(map[model.DomainName]int),
 }
 
 type doNotScanListWrapper struct {
-	ips   map[netip.Addr]int
-	nets  map[netip.Prefix]int
+	nets  *iptree.IPTree
 	names map[model.DomainName]int
 }
 
@@ -38,49 +39,31 @@ func (list *doNotScanListWrapper) FromFile(filePath string) error {
 }
 
 func (*doNotScanListWrapper) FromReader(r io.Reader) error {
-	csvReader := csv.NewReader(r)
-	allRecords, err := csvReader.ReadAll()
-	if err != nil {
-		return err
-	}
-
+	scanner := bufio.NewScanner(r)
 	result := doNotScanListWrapper{
-		ips:   make(map[netip.Addr]int),
-		nets:  make(map[netip.Prefix]int),
+		nets:  iptree.New(),
 		names: make(map[model.DomainName]int),
 	}
 
-	for _, record := range allRecords {
-		if len(record) < 2 { // Class, Value and then comments/optional columns
-			return fmt.Errorf("malformed entry %v in do not scan list", strings.Join(record, ","))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "#") {
+			continue
 		}
 
-		class := record[0] // IP, DN or PREFIX
-
-		if strings.EqualFold(class, "IP") {
-			if net.ParseIP(record[1]) == nil {
-				return fmt.Errorf("value %v in do not scan list is not a valid IP", record[1])
+		if subnetRegex.Match([]byte(line)) {
+			if err := result.AddPrefix(line); err != nil {
+				return err
 			}
 
-			result.AddIP(netip.MustParseAddr(record[1]))
+			continue
 		}
 
-		if strings.EqualFold(class, "PREFIX") {
-			p, err := netip.ParsePrefix(record[1])
-			if err != nil {
-				return fmt.Errorf("value %v in do not scan list is not a valid prefix", record[1])
-			}
-			result.AddPrefix(p)
+		dn, err := model.NewDomainName(line)
+		if err != nil {
+			return fmt.Errorf("value %v in do not scan list is not a valid domain name: %w", line, err)
 		}
-
-		if strings.EqualFold(class, "DN") {
-			dn, err := model.NewDomainName(record[1])
-			if err != nil {
-				return fmt.Errorf("value %v in do not scan list is not a valid domain name: %w", record[1], err)
-			}
-
-			result.AddDomainName(dn)
-		}
+		result.AddDomainName(dn)
 	}
 
 	// Swap
@@ -89,13 +72,6 @@ func (*doNotScanListWrapper) FromReader(r io.Reader) error {
 	doNotScanMu.Unlock()
 
 	return nil
-}
-
-// AddIP adds an ip address to the do-not-scan-list. IPs on that list will never receive a request.
-func (list *doNotScanListWrapper) AddIP(ip netip.Addr) {
-	doNotScanMu.Lock()
-	list.ips[ip] = 0 // We don't care about the value, the map is effectively used as a set
-	doNotScanMu.Unlock()
 }
 
 // AddDomainName adds a domain name to the do-not-scan-list.
@@ -107,12 +83,16 @@ func (list *doNotScanListWrapper) AddDomainName(domainName model.DomainName) {
 	doNotScanMu.Unlock()
 }
 
-// AddPrefix adds a IP prefix to the do-not-scan-list.
+// AddPrefix adds an IP prefix to the do-not-scan-list.
 // IPs in that prefix list will never receive a request.
-func (list *doNotScanListWrapper) AddPrefix(prefix netip.Prefix) {
+func (list *doNotScanListWrapper) AddPrefix(prefix string) error {
 	doNotScanMu.Lock()
-	list.nets[prefix] = 0
-	doNotScanMu.Unlock()
+	defer doNotScanMu.Unlock()
+	if err := list.nets.AddByString(prefix, true); err != nil {
+		return fmt.Errorf("value %v in do not scan list is not a valid prefix", prefix)
+	}
+	return nil
+
 }
 
 // MustNotScan returns true, if either the queried domain name, name server host name or name server IP are on the DoNotScan list.
@@ -120,28 +100,22 @@ func (list *doNotScanListWrapper) MustNotScan(q model.Question, nsName model.Dom
 	doNotScanMu.RLock()
 	defer doNotScanMu.RUnlock()
 
-	for i := 1; i <= q.Name.GetLabelCount(); i++ {
-		if _, isContained := list.names[q.Name.GetAncestor(i)]; isContained {
-			return true
+	if len(list.names) > 0 {
+		for i := 1; i <= q.Name.GetLabelCount(); i++ {
+			if _, isContained := list.names[q.Name.GetAncestor(i)]; isContained {
+				return true
+			}
 		}
-	}
 
-	for i := 1; i <= nsName.GetLabelCount(); i++ {
-		n := nsName.GetAncestor(i)
-		if _, isContained := list.names[n]; isContained {
-			return true
+		for i := 1; i <= nsName.GetLabelCount(); i++ {
+			n := nsName.GetAncestor(i)
+			if _, isContained := list.names[n]; isContained {
+				return true
+			}
 		}
+
 	}
 
-	if _, isContained := list.ips[nsIp]; isContained {
-		return true
-	}
-
-	for prefix := range list.nets {
-		if prefix.Contains(nsIp) {
-			return true
-		}
-	}
-
-	return false
+	v, _, _ := list.nets.GetByString(nsIp.String())
+	return v != nil && v.(bool)
 }
