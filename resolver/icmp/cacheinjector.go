@@ -4,8 +4,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"github.com/rs/zerolog"
 	"github.com/DNS-MSMT-INET/yodns/resolver/common"
+	"github.com/rs/zerolog"
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
@@ -184,7 +184,8 @@ func (ci CacheInjector) readICMPWorker(icmpParam icmpParams, conn net.PacketConn
 
 			ip, success := netip.AddrFromSlice(dst)
 			if !success {
-				panic("Failed to convert net.IP to netip.Addr")
+				ci.log.Error().Msgf("Failed to convert %v to netip.Addr", dst)
+				continue
 			}
 
 			ci.cache.MarkUnresponsive(ip, "ICMP DST_UNREACHABLE")

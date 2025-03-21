@@ -1,13 +1,13 @@
 package resolver
 
 import (
+	"github.com/DNS-MSMT-INET/yodns/resolver/common"
+	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	"github.com/alphadose/haxmap"
 	"github.com/enriquebris/goconcurrentqueue"
 	"github.com/miekg/dns"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
-	"github.com/DNS-MSMT-INET/yodns/resolver/common"
-	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	"math"
 	"net/netip"
 	"sync"
@@ -333,13 +333,15 @@ func (job *ResolutionJob) AddIPsToNameServer(msg *model.MessageExchange) {
 				if aRec, ok := rec.(*dns.A); ok {
 					ip, success := netip.AddrFromSlice(aRec.A)
 					if !success {
-						panic("Failed to convert net.IP to netip.Addr")
+						job.log.Error().Msgf("Failed to convert net.IP %v to netip.Addr", aRec.A)
+						continue
 					}
 					ips = append(ips, ip)
 				} else if aaaaRec, ok := rec.(*dns.AAAA); ok {
 					ip, success := netip.AddrFromSlice(aaaaRec.AAAA)
 					if !success {
-						panic("Failed to convert net.IP to netip.Addr")
+						job.log.Error().Msgf("Failed to convert net.IP %v to netip.Addr", aaaaRec.AAAA)
+						continue
 					}
 					ips = append(ips, ip)
 				}

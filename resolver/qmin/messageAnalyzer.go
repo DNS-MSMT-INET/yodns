@@ -1,9 +1,9 @@
 package qmin
 
 import (
-	"github.com/miekg/dns"
 	"github.com/DNS-MSMT-INET/yodns/resolver/common"
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
+	"github.com/miekg/dns"
 	"net/netip"
 )
 
@@ -214,11 +214,9 @@ func indexGlue(msg *dns.Msg, cap int) map[model.DomainName][]netip.Addr {
 
 			ips, _ := result[name]
 
-			ip, success := netip.AddrFromSlice(ipRec.A)
-			if !success {
-				panic("Failed to convert net.IP to netip.Addr")
+			if ip, success := netip.AddrFromSlice(ipRec.A); success {
+				result[name] = append(ips, ip)
 			}
-			result[name] = append(ips, ip)
 			continue
 		}
 
@@ -230,11 +228,10 @@ func indexGlue(msg *dns.Msg, cap int) map[model.DomainName][]netip.Addr {
 
 			ips, _ := result[name]
 
-			ip, success := netip.AddrFromSlice(ipRec.AAAA)
-			if !success {
-				panic("Failed to convert net.IP to netip.Addr")
+			if ip, success := netip.AddrFromSlice(ipRec.AAAA); success {
+				result[name] = append(ips, ip)
 			}
-			result[name] = append(ips, ip)
+
 			continue
 		}
 	}

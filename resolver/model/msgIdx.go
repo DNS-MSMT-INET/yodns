@@ -69,10 +69,7 @@ func (msgIdx *MsgIdx) AppendMessage(msg MessageExchange) {
 				if aRec.A == nil {
 					continue
 				}
-				ip, success := netip.AddrFromSlice(aRec.A)
-				if !success {
-					panic("Failed to convert net.IP to netip.Addr")
-				}
+				ip, _ := netip.AddrFromSlice(aRec.A)
 				msgIdx.ipsByNames[dn][ip] = nil
 			} else if aaaaRec, ok := rr.(*dns.AAAA); ok {
 				dn, err := NewDomainName(aaaaRec.Hdr.Name)
@@ -85,10 +82,7 @@ func (msgIdx *MsgIdx) AppendMessage(msg MessageExchange) {
 				if aaaaRec.AAAA == nil {
 					continue
 				}
-				ip, success := netip.AddrFromSlice(aaaaRec.AAAA)
-				if !success {
-					panic("Failed to convert net.IP to netip.Addr")
-				}
+				ip, _ := netip.AddrFromSlice(aaaaRec.AAAA)
 				msgIdx.ipsByNames[dn][ip] = nil
 			}
 		}
