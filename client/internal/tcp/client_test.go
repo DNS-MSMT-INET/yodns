@@ -3,11 +3,11 @@ package tcp
 import (
 	"encoding/binary"
 	"errors"
-	"github.com/google/uuid"
-	"github.com/miekg/dns"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/client/internal"
 	"github.com/DNS-MSMT-INET/yodns/client/internal/test"
+	"github.com/godruoyi/go-snowflake"
+	"github.com/miekg/dns"
 	"net"
 	"os"
 	"testing"
@@ -28,7 +28,7 @@ func (p MockPool) CreateEphemeral(remoteIP client.Address, remotePort uint16) (*
 }
 
 func TestClient_CanEnqueueAndReceive(t *testing.T) {
-	corrId := uuid.New()
+	corrId := snowflake.ID()
 	responseMsg := new(dns.Msg).SetQuestion("the.response.com.", 1)
 	internal.NewId = func() uint16 { return responseMsg.Id }
 	remoteAddr := test.MockAddr{}.NewRandom()
@@ -72,7 +72,7 @@ func TestClient_CanEnqueueAndReceive(t *testing.T) {
 }
 
 func TestClient_CanReceiveUnsolicitedMessage(t *testing.T) {
-	corrId := uuid.New()
+	corrId := snowflake.ID()
 	unsolicitedResponseMsg := new(dns.Msg).SetQuestion("the.response.com.", 1)
 	unsolicitedResponseMsg.Id = 1111
 	remoteAddr := test.MockAddr{}.NewRandom()
@@ -102,7 +102,7 @@ func TestClient_CanReceiveUnsolicitedMessage(t *testing.T) {
 
 	response := <-c.ResponseChan()
 
-	if response.CorrelationId != uuid.Nil {
+	if response.CorrelationId != 0 {
 		t.Errorf("Expected response.CorrelationId to be %v, got %v", corrId, response.CorrelationId)
 	}
 	if response.Message.Question[0].Name != unsolicitedResponseMsg.Question[0].Name {
@@ -114,7 +114,7 @@ func TestClient_CanReceiveUnsolicitedMessage(t *testing.T) {
 }
 
 func TestClient_PoolExhausted_FallbackToEphemeral(t *testing.T) {
-	corrId := uuid.New()
+	corrId := snowflake.ID()
 	responseMsg := new(dns.Msg).SetQuestion("the.response.com.", 1)
 	internal.NewId = func() uint16 { return responseMsg.Id }
 	remoteAddr := test.MockAddr{}.NewRandom()
@@ -169,7 +169,7 @@ func TestClient_PoolExhausted_FallbackToEphemeral(t *testing.T) {
 }
 
 func TestClient_SendErr_FallbackToEphemeral(t *testing.T) {
-	corrId := uuid.New()
+	corrId := snowflake.ID()
 	responseMsg := new(dns.Msg).SetQuestion("the.response.com.", 1)
 	internal.NewId = func() uint16 { return responseMsg.Id }
 	remoteAddr := test.MockAddr{}.NewRandom()
@@ -229,7 +229,7 @@ func TestClient_SendErr_FallbackToEphemeral(t *testing.T) {
 func TestClient_Timeout(t *testing.T) {
 	tcpTimeout := 250 * time.Millisecond
 	expectedTimeout := 2 * tcpTimeout // twice because we can have a ephemeral fallback
-	corrId := uuid.New()
+	corrId := snowflake.ID()
 	responseMsg := new(dns.Msg).SetQuestion("the.response.com.", 1)
 	internal.NewId = func() uint16 { return responseMsg.Id }
 	remoteAddr := test.MockAddr{}.NewRandom()

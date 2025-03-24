@@ -3,10 +3,9 @@ package internal
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
+	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
-	"github.com/DNS-MSMT-INET/yodns/client"
 	"golang.org/x/sync/semaphore"
 	"golang.org/x/time/rate"
 	"sync"
@@ -123,7 +122,7 @@ func (c *RateLimitingClient) ResponseChan() <-chan client.Response {
 	return c.responseChan
 }
 
-func (c *RateLimitingClient) Enqueue(correlationId uuid.UUID, q client.Question, ip client.Address, sendOpts client.SendOpts) {
+func (c *RateLimitingClient) Enqueue(correlationId uint64, q client.Question, ip client.Address, sendOpts client.SendOpts) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.rateLimitTimeout)
 	defer cancel()
 
@@ -133,7 +132,7 @@ func (c *RateLimitingClient) Enqueue(correlationId uuid.UUID, q client.Question,
 		sendOpts.Log.Err(err).
 			Msg("rate limit timeout")
 
-		c.responseChan <- ErrorResponse(correlationId, uuid.Nil, ip, "", 0, sendOpts.UseTCP, err)
+		c.responseChan <- ErrorResponse(correlationId, 0, ip, "", 0, sendOpts.UseTCP, err)
 		return
 	}
 
@@ -148,10 +147,10 @@ func (c *RateLimitingClient) releaseLockWorker(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case response := <-c.innerClient.ResponseChan():
-			// If correlationId == nil, that means we have an unsolicited message.
+			// If correlationId == 0, that means we have an unsolicited message.
 			// Most likely a response that was received after the timeout expired,
 			// but it can also happen if a nameserver sends a message that was not requested
-			if response.CorrelationId != uuid.Nil {
+			if response.CorrelationId != 0 {
 				if err := c.releaseRateLimitKey(response.NameServerIP); err != nil {
 					c.log.Err(err).
 						Interface("response", response).

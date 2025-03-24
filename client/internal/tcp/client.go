@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/client/internal"
-	"github.com/google/uuid"
 	"github.com/miekg/dns"
 	"math/rand"
 	"sync"
@@ -51,13 +50,13 @@ type Client struct {
 
 // inflightKey is a key for Client.inflight
 type inflightKey struct {
-	connId uuid.UUID
+	connId uint64
 	msgId  uint16
 }
 
 // inflightVal is a value of Client.inflight
 type inflightVal struct {
-	correlationId uuid.UUID
+	correlationId uint64
 	ip            client.Address
 	q             client.Question
 	sendOpts      client.SendOpts
@@ -83,7 +82,7 @@ func (c *Client) ResponseChan() <-chan client.Response {
 	return c.responseChan
 }
 
-func (c *Client) Enqueue(correlationId uuid.UUID, q client.Question, ip client.Address, sendOpts client.SendOpts) {
+func (c *Client) Enqueue(correlationId uint64, q client.Question, ip client.Address, sendOpts client.SendOpts) {
 	conn, err := c.pool.GetOrCreate(ip, c.DestinationPort, c.onReceive)
 
 	var cerr client.Error
@@ -93,7 +92,7 @@ func (c *Client) Enqueue(correlationId uuid.UUID, q client.Question, ip client.A
 	}
 
 	if err != nil {
-		c.responseChan <- internal.ErrorResponse(correlationId, uuid.Nil, ip, "", 0, true, err)
+		c.responseChan <- internal.ErrorResponse(correlationId, 0, ip, "", 0, true, err)
 		return
 	}
 
@@ -236,10 +235,10 @@ func resubmitEphemeral(conn *PooledConn, c *Client) {
 	}
 }
 
-func (c *Client) fallbackEphemeral(q client.Question, ip client.Address, sendOpts client.SendOpts, correlationId uuid.UUID) {
+func (c *Client) fallbackEphemeral(q client.Question, ip client.Address, sendOpts client.SendOpts, correlationId uint64) {
 	conn, err := c.pool.CreateEphemeral(ip, c.DestinationPort)
 	if err != nil {
-		c.responseChan <- internal.ErrorResponse(correlationId, uuid.Nil, ip, "", 0, true, err)
+		c.responseChan <- internal.ErrorResponse(correlationId, 0, ip, "", 0, true, err)
 		return
 	}
 

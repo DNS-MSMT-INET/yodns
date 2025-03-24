@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"github.com/DNS-MSMT-INET/yodns/client"
-	"github.com/google/uuid"
 	"github.com/miekg/dns"
 	"time"
 )
@@ -42,16 +41,18 @@ func SetTCPKeepalive(msgToSend *dns.Msg, keepAlive time.Duration) {
 	})
 }
 
-func ErrorResponse(correlationId uuid.UUID, connId uuid.UUID,
+func ErrorResponse(correlationId uint64,
+	connId uint64,
 	nameServerIp client.Address,
 	responseAddr string,
 	rtt time.Duration,
 	tcp bool,
 	err error) client.Response {
+
 	// An unsolicited response is a response that was not requested.
-	// If the correlationId is nil, it should have been an UnsolicitedResponse.
-	if correlationId == uuid.Nil {
-		panic("CorrelationId may only be nil for unsolicited responses.")
+	// If the correlationId is 0, it should have been an UnsolicitedResponse.
+	if correlationId == 0 {
+		panic("CorrelationId may only be 0 for unsolicited responses.")
 	}
 
 	return client.Response{
@@ -66,17 +67,17 @@ func ErrorResponse(correlationId uuid.UUID, connId uuid.UUID,
 	}
 }
 
-func MessageResponse(correlationId uuid.UUID,
-	connId uuid.UUID,
+func MessageResponse(correlationId uint64,
+	connId uint64,
 	nameServerIp client.Address,
 	responseAddr string,
 	responseMsg *dns.Msg,
 	rtt time.Duration,
 	tcp bool) client.Response {
 	// An unsolicited response is a response that was not requested.
-	// If the correlationId is nil, it should have been an UnsolicitedResponse.
-	if correlationId == uuid.Nil {
-		panic("CorrelationId may only be nil for unsolicited responses.")
+	// If the correlationId is 0, it should have been an UnsolicitedResponse.
+	if correlationId == 0 {
+		panic("CorrelationId may only be 0 for unsolicited responses.")
 	}
 
 	return client.Response{
@@ -98,12 +99,12 @@ func MessageResponse(correlationId uuid.UUID,
 // because the server set the wrong dns id in the response header or
 // because the request has already been answered (duplicated response)
 func UnsolicitedResponse(
-	connId uuid.UUID,
+	connId uint64,
 	responseAddr string,
 	responseMsg *dns.Msg,
 	tcp bool) client.Response {
 	return client.Response{
-		CorrelationId: uuid.Nil,
+		CorrelationId: 0,
 		Message:       responseMsg,
 		ConnId:        connId,
 		ResponseAddr:  responseAddr,

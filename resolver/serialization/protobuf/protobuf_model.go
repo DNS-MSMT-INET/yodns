@@ -1,9 +1,10 @@
 package protobuf
 
 import (
+	"encoding/binary"
+	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	"github.com/google/uuid"
 	"github.com/miekg/dns"
-	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"net/netip"
 	"time"
@@ -11,6 +12,7 @@ import (
 
 const shortUUIDLength = 4
 const longUUIDLength = 16
+const snowflakeUUIDLength = 8
 
 func (msg *MessageExchange) From(exchange *model.MessageExchange) error {
 	msg.OriginalQuestion = &Question{
@@ -20,24 +22,23 @@ func (msg *MessageExchange) From(exchange *model.MessageExchange) error {
 	}
 	msg.ResponseAddr = exchange.ResponseAddr
 	msg.NameServerIp = exchange.NameServerIP.String()
+
 	msg.Metadata = &Metadata{
 		FromCache:     exchange.Metadata.FromCache,
 		RetryIdx:      uint32(exchange.Metadata.RetryIdx),
 		Tcp:           exchange.Metadata.TCP,
-		CorrelationId: exchange.Metadata.CorrelationId[:],
-		ParentId:      exchange.Metadata.ParentId[:],
 		EnqueueTime:   timestamppb.New(exchange.Metadata.EnqueueTime),
 		DequeueTime:   timestamppb.New(exchange.Metadata.DequeueTime),
 		IsFinal:       exchange.Metadata.IsFinal,
 		Rtt:           int64(exchange.Metadata.RTT),
+		ConnId:        make([]byte, 8),
+		CorrelationId: make([]byte, 8),
+		ParentId:      make([]byte, 8),
 	}
 
-	// TODO: connID should be UUID not string to remove this ambiguity
-	if connId, err := uuid.Parse(exchange.Metadata.ConnId); err == nil {
-		msg.Metadata.ConnId = connId[:]
-	} else {
-		msg.Metadata.ConnId = []byte(exchange.Metadata.ConnId)
-	}
+	binary.BigEndian.PutUint64(msg.Metadata.ConnId, exchange.Metadata.ConnId)
+	binary.BigEndian.PutUint64(msg.Metadata.CorrelationId, exchange.Metadata.CorrelationId)
+	binary.BigEndian.PutUint64(msg.Metadata.ParentId, exchange.Metadata.ParentId)
 
 	if exchange.Message != nil {
 		if buf, err := exchange.Message.Pack(); err == nil {
@@ -97,30 +98,39 @@ func (msg *MessageExchange) ToModel() (model.MessageExchange, error) {
 	}
 
 	if len(msg.Metadata.ConnId) == 0 {
-		result.Metadata.ConnId = ""
+		result.Metadata.ConnId = 0
 	} else if connID, err := parseUUID(msg.Metadata.ConnId); err == nil {
-		result.Metadata.ConnId = connID.String()
-	} else {
-		result.Metadata.ConnId = string(msg.Metadata.ConnId)
+		result.Metadata.ConnId = connID
 	}
 
 	return result, nil
 }
 
-func parseUUID(bytes []byte) (uuid.UUID, error) {
-	// Default UUID length
+func parseUUID(bytes []byte) (uint64, error) {
+	// Snowflake UUID length
+	// This is the most recent UUID format we use
+	if len(bytes) == snowflakeUUIDLength {
+		return binary.BigEndian.Uint64(bytes), nil
+	}
+
+	// A full UUID - used in earlier versions of the software, but taking up too much storage.
+	// For backwards compatibility, we read the last 8 bytes and convert it to a Snowflake UUID
 	if len(bytes) == longUUIDLength {
-		return uuid.FromBytes(bytes)
+		return binary.BigEndian.Uint64(bytes[:snowflakeUUIDLength]), nil
 	}
 
 	// Our "short UUID" is missing some bytes in the beginning to reduce storage needs.
 	// Fill it up to full length before parsing
 	if len(bytes) == shortUUIDLength {
-		idBytes := make([]byte, longUUIDLength)
-		copy(idBytes[longUUIDLength-shortUUIDLength:], bytes)
-		return uuid.FromBytes(idBytes)
+		idBytes := make([]byte, snowflakeUUIDLength)
+		copy(idBytes[snowflakeUUIDLength-shortUUIDLength:], bytes)
+		return binary.BigEndian.Uint64(idBytes), nil
 	}
 
 	// Legacy: We used to store the uuid as string, but we still want to be able to parse the old files.
-	return uuid.Parse(string(bytes))
+	if id, err := uuid.Parse(string(bytes)); err != nil {
+		return 0, err
+	} else {
+		return binary.BigEndian.Uint64(id[:snowflakeUUIDLength]), nil
+	}
 }
