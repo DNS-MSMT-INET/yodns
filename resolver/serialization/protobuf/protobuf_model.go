@@ -116,7 +116,7 @@ func parseUUID(bytes []byte) (uint64, error) {
 	// A full UUID - used in earlier versions of the software, but taking up too much storage.
 	// For backwards compatibility, we read the last 8 bytes and convert it to a Snowflake UUID
 	if len(bytes) == longUUIDLength {
-		return binary.BigEndian.Uint64(bytes[:snowflakeUUIDLength]), nil
+		return binary.BigEndian.Uint64(bytes[longUUIDLength-snowflakeUUIDLength:]), nil
 	}
 
 	// Our "short UUID" is missing some bytes in the beginning to reduce storage needs.
