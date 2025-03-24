@@ -2,9 +2,9 @@ package client
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"github.com/miekg/dns"
 	"github.com/rs/zerolog"
+	"strconv"
 	"time"
 )
 
@@ -16,7 +16,7 @@ type DNSClient struct {
 
 // DNSClientDecorator is the interface for DNS clients to implement a decorator pattern
 type DNSClientDecorator interface {
-	Enqueue(correlationId uuid.UUID, q Question, ip Address, sendOpts SendOpts)
+	Enqueue(correlationId uint64, q Question, ip Address, sendOpts SendOpts)
 	ResponseChan() <-chan Response
 }
 
@@ -50,10 +50,10 @@ type Address interface {
 type Response struct {
 	// The correlationId provided in the Enqueue() call.
 	// Use to map requests with responses.
-	CorrelationId uuid.UUID
+	CorrelationId uint64
 
 	// ConnId uniquely specifies the connection that was used to send the request
-	ConnId uuid.UUID
+	ConnId uint64
 
 	// The response message
 	Message *dns.Msg
@@ -84,7 +84,7 @@ type Option func(*SendOpts) // For implementation details: https://commandcenter
 // enqueue blocks until a place in the queue is freed, thus applying backpressure on the system.
 // No order must be assumed between messages sent and received.
 // For example slow responses by nameservers or rate limiting can lead to a reordering of the responses.
-func (c DNSClient) Enqueue(correlationId uuid.UUID, q Question, ip Address, opts ...Option) {
+func (c DNSClient) Enqueue(correlationId uint64, q Question, ip Address, opts ...Option) {
 	sendOpts := DefaultSendOpts
 
 	// https://commandcenter.blogspot.com/2014/01/self-referential-functions-and-design.html
@@ -93,7 +93,7 @@ func (c DNSClient) Enqueue(correlationId uuid.UUID, q Question, ip Address, opts
 	}
 
 	sendOpts.Log = sendOpts.Log.With().
-		Str("correlationId", correlationId.String()).
+		Str("correlationId", strconv.FormatUint(correlationId, 10)).
 		Interface("ns", ip).
 		Interface("question", q).
 		Logger()

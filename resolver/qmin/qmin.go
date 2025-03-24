@@ -8,6 +8,7 @@ import (
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	"github.com/miekg/dns"
 	"github.com/rs/zerolog"
+	"strconv"
 )
 
 type Qmin struct {
@@ -367,7 +368,7 @@ func enrichLog(log zerolog.Logger, originalQName model.DomainName, ns *model.Nam
 		Str("fqdn", string(originalQName)).
 		Str("ip", msgExchange.NameServerIP.String()).
 		Str("nsName", string(ns.Name)).
-		Str("corrId", msgExchange.Metadata.CorrelationId.String())
+		Str("corrId", strconv.FormatUint(msgExchange.Metadata.CorrelationId, 10))
 
 	if log.GetLevel() <= zerolog.InfoLevel {
 		logCtx.Str("qName", string(msgExchange.OriginalQuestion.Name))

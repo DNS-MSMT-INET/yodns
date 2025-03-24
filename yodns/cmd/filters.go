@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/google/uuid"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/resolver"
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
@@ -86,14 +85,14 @@ func IpFilter(ips []string) FilterPredicate[model.MessageExchange] {
 	}
 }
 
-func CorrelationIDFilter(ids []string) FilterPredicate[model.MessageExchange] {
-	idMap := make(map[uuid.UUID]any)
+func CorrelationIDFilter(ids []uint) FilterPredicate[model.MessageExchange] {
+	idMap := make(map[uint]any)
 	for _, id := range ids {
-		idMap[uuid.MustParse(id)] = nil
+		idMap[id] = nil
 	}
 
 	return func(msg model.MessageExchange) bool {
-		_, ok := idMap[msg.Metadata.CorrelationId]
+		_, ok := idMap[uint(msg.Metadata.CorrelationId)]
 		return ok
 	}
 }

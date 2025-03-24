@@ -2,11 +2,11 @@ package udp
 
 import (
 	"errors"
-	"github.com/google/uuid"
-	"github.com/miekg/dns"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/client/internal"
 	"github.com/DNS-MSMT-INET/yodns/client/internal/test"
+	"github.com/godruoyi/go-snowflake"
+	"github.com/miekg/dns"
 	"net"
 	"testing"
 	"time"
@@ -21,7 +21,7 @@ func (p MockPool) GetOrCreate(onReceive ReceiveCallback) (*PooledConn, error) {
 }
 
 func TestClient_CanEnqueueAndReceive(t *testing.T) {
-	corrId := uuid.New()
+	corrId := snowflake.ID()
 	responseMsg := new(dns.Msg).SetQuestion("the.response.com.", 1)
 	internal.NewId = func() uint16 { return responseMsg.Id }
 
@@ -67,7 +67,7 @@ func TestClient_CanEnqueueAndReceive(t *testing.T) {
 
 func TestClient_CanTimeout(t *testing.T) {
 	expectedTimeout := 500 * time.Millisecond
-	corrId := uuid.New()
+	corrId := snowflake.ID()
 	writeCalls := 0
 	writer := test.MockPacketConn{
 		WriteToFunc: func(bytes []byte, addr net.Addr) (int, error) {
@@ -107,7 +107,7 @@ func TestClient_CanTimeout(t *testing.T) {
 }
 
 func TestClient_CanReceiveUnsolicitedMessage(t *testing.T) {
-	corrId := uuid.New()
+	corrId := snowflake.ID()
 
 	unsolicitedResponseMsg := new(dns.Msg).SetQuestion("the.response.com.", 1)
 	unsolicitedResponseMsg.Id = 1111
@@ -137,7 +137,7 @@ func TestClient_CanReceiveUnsolicitedMessage(t *testing.T) {
 
 	response := <-c.ResponseChan()
 
-	if response.CorrelationId != uuid.Nil {
+	if response.CorrelationId != 0 {
 		t.Errorf("Expected response.CorrelationId to be %v, got %v", corrId, response.CorrelationId)
 	}
 

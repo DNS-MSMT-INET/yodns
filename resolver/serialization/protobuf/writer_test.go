@@ -3,12 +3,13 @@ package protobuf
 import (
 	"bytes"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/miekg/dns"
 	"github.com/DNS-MSMT-INET/yodns/resolver"
 	"github.com/DNS-MSMT-INET/yodns/resolver/common"
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	"github.com/DNS-MSMT-INET/yodns/resolver/serialization"
+	"github.com/godruoyi/go-snowflake"
+	"github.com/google/uuid"
+	"github.com/miekg/dns"
 	"golang.org/x/exp/slices"
 	"io"
 	"math"
@@ -304,10 +305,10 @@ func getExampleResolverResult() resolver.Result {
 		Metadata: model.Metadata{
 			FromCache:     false,
 			RetryIdx:      0,
-			ConnId:        uuid.New().String(),
+			ConnId:        snowflake.ID(),
 			TCP:           false,
-			CorrelationId: uuid.New(),
-			ParentId:      uuid.New(),
+			CorrelationId: snowflake.ID(),
+			ParentId:      snowflake.ID(),
 			EnqueueTime:   time.Now(),
 			DequeueTime:   time.Now(),
 		},
@@ -327,10 +328,10 @@ func getExampleResolverResult() resolver.Result {
 		Metadata: model.Metadata{
 			FromCache:     true,
 			RetryIdx:      4,
-			ConnId:        uuid.New().String(),
+			ConnId:        snowflake.ID(),
 			TCP:           true,
-			CorrelationId: uuid.New(),
-			ParentId:      uuid.New(),
+			CorrelationId: snowflake.ID(),
+			ParentId:      snowflake.ID(),
 			EnqueueTime:   time.Now(),
 			DequeueTime:   time.Now(),
 		},
@@ -366,10 +367,10 @@ func getExampleResolverResult() resolver.Result {
 		Metadata: model.Metadata{
 			FromCache:     true,
 			RetryIdx:      4,
-			ConnId:        uuid.New().String(),
+			ConnId:        snowflake.ID(),
 			TCP:           true,
-			CorrelationId: uuid.New(),
-			ParentId:      uuid.New(),
+			CorrelationId: snowflake.ID(),
+			ParentId:      snowflake.ID(),
 			EnqueueTime:   time.Now(),
 			DequeueTime:   time.Now(),
 		},

@@ -2,10 +2,10 @@ package udp
 
 import (
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/miekg/dns"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/client/internal"
+	"github.com/godruoyi/go-snowflake"
+	"github.com/miekg/dns"
 	"net"
 	"sync/atomic"
 	"time"
@@ -17,7 +17,7 @@ var errWrittenTooManyBytes = fmt.Errorf("not the whole message was written")
 type PooledConn struct {
 	*internal.MessageIdGenerator
 
-	Id     uuid.UUID
+	Id     uint64
 	faulty int32
 
 	IsIPV6 bool
@@ -28,7 +28,7 @@ type PooledConn struct {
 	onReceive ReceiveCallback
 }
 
-type ReceiveCallback func(uuid.UUID, *dns.Msg, string, error)
+type ReceiveCallback func(uint64, *dns.Msg, string, error)
 
 func newPooledUDPConn(udpSize uint16, isIPV6 bool, inner net.PacketConn) *PooledConn {
 	if udpSize < dns.MinMsgSize {
@@ -37,7 +37,7 @@ func newPooledUDPConn(udpSize uint16, isIPV6 bool, inner net.PacketConn) *Pooled
 
 	conn := &PooledConn{
 		inner:              inner,
-		Id:                 uuid.New(),
+		Id:                 snowflake.ID(),
 		MessageIdGenerator: internal.NewIdGen(),
 		udpSize:            udpSize,
 		IsIPV6:             isIPV6,
@@ -56,7 +56,7 @@ func (conn *PooledConn) IsFaulty() bool {
 	return atomic.LoadInt32(&conn.faulty) == 1
 }
 
-func (conn *PooledConn) ID() uuid.UUID {
+func (conn *PooledConn) ID() uint64 {
 	return conn.Id
 }
 

@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"github.com/DNS-MSMT-INET/yodns/client"
-	"github.com/google/uuid"
 )
 
 var _ client.DNSClientDecorator = new(ConnectionReusingClient)
@@ -34,7 +33,7 @@ func (c *ConnectionReusingClient) ResponseChan() <-chan client.Response {
 	return c.responseChan
 }
 
-func (c *ConnectionReusingClient) Enqueue(correlationId uuid.UUID, q client.Question, ip client.Address, sendOpts client.SendOpts) {
+func (c *ConnectionReusingClient) Enqueue(correlationId uint64, q client.Question, ip client.Address, sendOpts client.SendOpts) {
 	if sendOpts.UseTCP {
 		c.TCPClient.Enqueue(correlationId, q, ip, sendOpts)
 	} else {

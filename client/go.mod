@@ -3,6 +3,7 @@ module github.com/DNS-MSMT-INET/yodns/client
 go 1.22.3
 
 require (
+	github.com/godruoyi/go-snowflake v0.0.2
 	github.com/google/uuid v1.6.0
 	github.com/jellydator/ttlcache/v3 v3.3.0
 	github.com/miekg/dns v1.1.62

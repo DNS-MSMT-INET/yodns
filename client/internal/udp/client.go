@@ -1,14 +1,13 @@
 package udp
 
 import (
-	"github.com/miekg/dns"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/client/internal"
+	"github.com/godruoyi/go-snowflake"
+	"github.com/miekg/dns"
 	"sync"
 	"sync/atomic"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 var _ client.DNSClientDecorator = new(Client)
@@ -51,13 +50,13 @@ type Client struct {
 
 // inflightKey is a key for Client.inflight
 type inflightKey struct {
-	connId uuid.UUID
+	connId uint64
 	msgId  uint16
 }
 
 // inflightVal is a value of Client.inflight
 type inflightVal struct {
-	correlationId uuid.UUID
+	correlationId uint64
 	question      client.Question
 	ip            client.Address
 	sendTime      time.Time
@@ -81,7 +80,7 @@ func (c *Client) ResponseChan() <-chan client.Response {
 	return c.responseChan
 }
 
-func (c *Client) Enqueue(correlationId uuid.UUID, q client.Question, ip client.Address, sendOpts client.SendOpts) {
+func (c *Client) Enqueue(correlationId uint64, q client.Question, ip client.Address, sendOpts client.SendOpts) {
 	var conn *PooledConn
 	var err error
 
@@ -92,7 +91,7 @@ func (c *Client) Enqueue(correlationId uuid.UUID, q client.Question, ip client.A
 	}
 
 	if err != nil { // Error when establishing the connection, e.g. Dial Timeout
-		c.responseChan <- internal.ErrorResponse(correlationId, uuid.Nil, ip, "", 0, false, err)
+		c.responseChan <- internal.ErrorResponse(correlationId, 0, ip, "", 0, false, err)
 		return
 	}
 
@@ -103,7 +102,7 @@ func (c *Client) Enqueue(correlationId uuid.UUID, q client.Question, ip client.A
 	msg.Id = conn.GetFreeMessageID()
 
 	key := inflightKey{
-		connId: conn.ID(),
+		connId: snowflake.ID(),
 		msgId:  msg.Id,
 	}
 
@@ -130,7 +129,7 @@ func (c *Client) Enqueue(correlationId uuid.UUID, q client.Question, ip client.A
 
 	if err = conn.WriteMessageTo(msg, ip, c.DestinationPort, c.WriteTimeout); err != nil {
 		c.inflight.Delete(key)
-		c.responseChan <- internal.ErrorResponse(correlationId, conn.ID(), ip, "", 0, false, err)
+		c.responseChan <- internal.ErrorResponse(correlationId, snowflake.ID(), ip, "", 0, false, err)
 
 		return
 	}
@@ -143,7 +142,7 @@ func (c *Client) Enqueue(correlationId uuid.UUID, q client.Question, ip client.A
 				panic("unknown type of entry in inflight map")
 			}
 
-			c.responseChan <- internal.ErrorResponse(correlationId, conn.ID(), ip, "", time.Since(value.sendTime), false, client.ErrReceiveTimeout)
+			c.responseChan <- internal.ErrorResponse(correlationId, snowflake.ID(), ip, "", time.Since(value.sendTime), false, client.ErrReceiveTimeout)
 		}
 
 		// ReleaseMessageID will wait for a bit until releasing the message id for reuse.
@@ -153,7 +152,7 @@ func (c *Client) Enqueue(correlationId uuid.UUID, q client.Question, ip client.A
 	atomicTimer.Store(timeout)
 }
 
-func (c *Client) onReceive(connId uuid.UUID, msg *dns.Msg, addr string, err error) {
+func (c *Client) onReceive(connId uint64, msg *dns.Msg, addr string, err error) {
 	entry, loaded := c.inflight.LoadAndDelete(inflightKey{
 		msgId:  msg.Id,
 		connId: connId,

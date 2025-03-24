@@ -1,10 +1,11 @@
 package resolver
 
 import (
-	"github.com/enriquebris/goconcurrentqueue"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/resolver/common"
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
+	"github.com/enriquebris/goconcurrentqueue"
+	"github.com/godruoyi/go-snowflake"
 	"net/netip"
 	"sync"
 	"time"
@@ -67,7 +68,7 @@ type Request struct {
 	// parentCorrelationId is the correlationId of the message exchange that is the
 	// logical parent of this exchange (i.e. the message that "caused" the next message).
 	// It is optional, but useful to understand how the resolver is working.
-	parentCorrelationId uuid.UUID
+	parentCorrelationId uint64
 
 	// The question to ask the name server
 	question model.Question
@@ -314,10 +315,10 @@ func (worker *RequestWorker) Enqueue(request Request) {
 
 	useTCPActual := worker.useTCPActual(false, request.disableTCPFallback, 0, false, status)
 
-	worker.enqueue(uuid.New(), request, 0, request.disableEDNS0, useTCPActual, status)
+	worker.enqueue(snowflake.ID(), request, 0, request.disableEDNS0, useTCPActual, status)
 }
 
-func (worker *RequestWorker) enqueue(correlationId uuid.UUID, request Request, retryCount uint, disableEDNS0 bool, useTCP bool, status serverStatus) {
+func (worker *RequestWorker) enqueue(correlationId uint64, request Request, retryCount uint, disableEDNS0 bool, useTCP bool, status serverStatus) {
 	// This call is on a very hot path
 	// We deliberately not use a CounterVec here, because it is more expensive on the CPU
 	Metrics.QueriesSent.Inc()
@@ -372,7 +373,7 @@ func (worker *RequestWorker) enqueue(correlationId uuid.UUID, request Request, r
 		client.LogTo(request.log))
 }
 
-func (worker *RequestWorker) respondFromCache(correlationId uuid.UUID,
+func (worker *RequestWorker) respondFromCache(correlationId uint64,
 	retryIndex uint,
 	request Request) bool {
 
@@ -395,7 +396,7 @@ func (worker *RequestWorker) respondFromCache(correlationId uuid.UUID,
 	return false
 }
 
-func (worker *RequestWorker) respondFromInfraCache(correlationId uuid.UUID,
+func (worker *RequestWorker) respondFromInfraCache(correlationId uint64,
 	retryIndex uint,
 	request Request,
 	status serverStatus,
@@ -438,7 +439,7 @@ func toQuestion(q model.Question) client.Question {
 	}
 }
 
-func unresponsiveMessageExchange(q model.Question, ip netip.Addr, reason string, correlationId uuid.UUID, useTCP bool, retryIdx uint) model.MessageExchange {
+func unresponsiveMessageExchange(q model.Question, ip netip.Addr, reason string, correlationId uint64, useTCP bool, retryIdx uint) model.MessageExchange {
 	return model.MessageExchange{
 		OriginalQuestion: q,
 		NameServerIP:     ip,
@@ -459,7 +460,7 @@ func unresponsiveMessageExchange(q model.Question, ip netip.Addr, reason string,
 }
 
 func toMessageExchange(response client.Response,
-	parentCorrelationId uuid.UUID,
+	parentCorrelationId uint64,
 	nameServerIp netip.Addr,
 	originalQ model.Question,
 	enqueueTime time.Time,
@@ -475,7 +476,7 @@ func toMessageExchange(response client.Response,
 		Metadata: model.Metadata{
 			FromCache:     fromCache,
 			RetryIdx:      retryIdx,
-			ConnId:        response.ConnId.String(),
+			ConnId:        response.ConnId,
 			TCP:           useTCP,
 			EnqueueTime:   enqueueTime,
 			DequeueTime:   time.Now().UTC(),

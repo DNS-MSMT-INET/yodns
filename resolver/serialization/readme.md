@@ -19,7 +19,7 @@ Unfortunately, there are many performance benchmarks and just as many different 
 - Install protobuf compiler (protoc) and go-tooling (protoc-gen-go)
 - Update model.proto
 - Run protoc in folder `dnsmonitor/collector/io` to generate go code
-  - > cd resolve/serialization
+  - > cd resolver/serialization
   - > protoc --go_out=. protobuf/protobuf_model.proto
 
 **Pros**

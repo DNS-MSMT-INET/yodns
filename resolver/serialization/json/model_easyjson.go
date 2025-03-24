@@ -4,10 +4,10 @@ package json
 
 import (
 	json "encoding/json"
+	model "github.com/DNS-MSMT-INET/yodns/resolver/model"
 	easyjson "github.com/mailru/easyjson"
 	jlexer "github.com/mailru/easyjson/jlexer"
 	jwriter "github.com/mailru/easyjson/jwriter"
-	model "github.com/DNS-MSMT-INET/yodns/resolver/model"
 	netip "net/netip"
 	time "time"
 )
@@ -20,7 +20,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson(in *jlexer.Lexer, out *Zone) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson(in *jlexer.Lexer, out *Zone) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -120,7 +120,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson(out *jwriter.Writer, in Zone) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson(out *jwriter.Writer, in Zone) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -183,27 +183,27 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 // MarshalJSON supports json.Marshaler interface
 func (v Zone) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson(&w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Zone) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson(w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Zone) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson(&r, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Zone) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson(l, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson(l, v)
 }
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson1(in *jlexer.Lexer, out *WriteModel) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson1(in *jlexer.Lexer, out *WriteModel) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -286,7 +286,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson1(out *jwriter.Writer, in WriteModel) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson1(out *jwriter.Writer, in WriteModel) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -343,27 +343,27 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 // MarshalJSON supports json.Marshaler interface
 func (v WriteModel) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson1(&w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v WriteModel) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson1(w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *WriteModel) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson1(&r, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *WriteModel) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson1(l, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson1(l, v)
 }
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson2(in *jlexer.Lexer, out *TaggedDomain) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson2(in *jlexer.Lexer, out *TaggedDomain) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -398,7 +398,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson2(out *jwriter.Writer, in TaggedDomain) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson2(out *jwriter.Writer, in TaggedDomain) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -423,27 +423,27 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 // MarshalJSON supports json.Marshaler interface
 func (v TaggedDomain) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson2(&w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v TaggedDomain) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson2(w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *TaggedDomain) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson2(&r, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *TaggedDomain) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson2(l, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson2(l, v)
 }
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson3(in *jlexer.Lexer, out *ResourceRecord) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson3(in *jlexer.Lexer, out *ResourceRecord) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -482,7 +482,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson3(out *jwriter.Writer, in ResourceRecord) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson3(out *jwriter.Writer, in ResourceRecord) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -517,27 +517,27 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 // MarshalJSON supports json.Marshaler interface
 func (v ResourceRecord) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson3(&w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v ResourceRecord) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson3(w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *ResourceRecord) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson3(&r, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *ResourceRecord) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson3(l, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson3(l, v)
 }
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson4(in *jlexer.Lexer, out *NameServer) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson4(in *jlexer.Lexer, out *NameServer) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -593,7 +593,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson4(out *jwriter.Writer, in NameServer) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson4(out *jwriter.Writer, in NameServer) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -624,27 +624,27 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 // MarshalJSON supports json.Marshaler interface
 func (v NameServer) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson4(&w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v NameServer) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson4(w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *NameServer) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson4(&r, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *NameServer) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson4(l, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson4(l, v)
 }
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson5(in *jlexer.Lexer, out *MessageExchange) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson5(in *jlexer.Lexer, out *MessageExchange) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -664,7 +664,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 		}
 		switch key {
 		case "OriginalQuestion":
-			easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel(in, &out.OriginalQuestion)
+			easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverModel(in, &out.OriginalQuestion)
 		case "ResponseAddr":
 			out.ResponseAddr = string(in.String())
 		case "NameServerIP":
@@ -672,7 +672,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 				in.AddError((out.NameServerIP).UnmarshalText(data))
 			}
 		case "Metadata":
-			easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel1(in, &out.Metadata)
+			easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverModel1(in, &out.Metadata)
 		case "Message":
 			if in.IsNull() {
 				in.Skip()
@@ -691,7 +691,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 				if out.Error == nil {
 					out.Error = new(model.SendError)
 				}
-				easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel2(in, out.Error)
+				easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverModel2(in, out.Error)
 			}
 		default:
 			in.SkipRecursive()
@@ -703,14 +703,14 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson5(out *jwriter.Writer, in MessageExchange) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson5(out *jwriter.Writer, in MessageExchange) {
 	out.RawByte('{')
 	first := true
 	_ = first
 	{
 		const prefix string = ",\"OriginalQuestion\":"
 		out.RawString(prefix[1:])
-		easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel(out, in.OriginalQuestion)
+		easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverModel(out, in.OriginalQuestion)
 	}
 	{
 		const prefix string = ",\"ResponseAddr\":"
@@ -725,7 +725,7 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 	{
 		const prefix string = ",\"Metadata\":"
 		out.RawString(prefix)
-		easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel1(out, in.Metadata)
+		easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverModel1(out, in.Metadata)
 	}
 	{
 		const prefix string = ",\"Message\":"
@@ -742,7 +742,7 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 		if in.Error == nil {
 			out.RawString("null")
 		} else {
-			easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel2(out, *in.Error)
+			easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverModel2(out, *in.Error)
 		}
 	}
 	out.RawByte('}')
@@ -751,27 +751,27 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 // MarshalJSON supports json.Marshaler interface
 func (v MessageExchange) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson5(&w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v MessageExchange) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson5(w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *MessageExchange) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson5(&r, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *MessageExchange) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson5(l, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson5(l, v)
 }
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel2(in *jlexer.Lexer, out *model.SendError) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverModel2(in *jlexer.Lexer, out *model.SendError) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -804,7 +804,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel2(in *jle
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel2(out *jwriter.Writer, in model.SendError) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverModel2(out *jwriter.Writer, in model.SendError) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -820,7 +820,7 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel2(out *jw
 	}
 	out.RawByte('}')
 }
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel1(in *jlexer.Lexer, out *model.Metadata) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverModel1(in *jlexer.Lexer, out *model.Metadata) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -844,19 +844,15 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel1(in *jle
 		case "RetryIdx":
 			out.RetryIdx = uint(in.Uint())
 		case "ConnId":
-			out.ConnId = string(in.String())
+			out.ConnId = uint64(in.Uint64())
 		case "TCP":
 			out.TCP = bool(in.Bool())
 		case "IsFinal":
 			out.IsFinal = bool(in.Bool())
 		case "CorrelationId":
-			if data := in.UnsafeBytes(); in.Ok() {
-				in.AddError((out.CorrelationId).UnmarshalText(data))
-			}
+			out.CorrelationId = uint64(in.Uint64())
 		case "ParentId":
-			if data := in.UnsafeBytes(); in.Ok() {
-				in.AddError((out.ParentId).UnmarshalText(data))
-			}
+			out.ParentId = uint64(in.Uint64())
 		case "EnqueueTime":
 			if data := in.Raw(); in.Ok() {
 				in.AddError((out.EnqueueTime).UnmarshalJSON(data))
@@ -877,7 +873,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel1(in *jle
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel1(out *jwriter.Writer, in model.Metadata) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverModel1(out *jwriter.Writer, in model.Metadata) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -894,7 +890,7 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel1(out *jw
 	{
 		const prefix string = ",\"ConnId\":"
 		out.RawString(prefix)
-		out.String(string(in.ConnId))
+		out.Uint64(uint64(in.ConnId))
 	}
 	{
 		const prefix string = ",\"TCP\":"
@@ -909,12 +905,12 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel1(out *jw
 	{
 		const prefix string = ",\"CorrelationId\":"
 		out.RawString(prefix)
-		out.RawText((in.CorrelationId).MarshalText())
+		out.Uint64(uint64(in.CorrelationId))
 	}
 	{
 		const prefix string = ",\"ParentId\":"
 		out.RawString(prefix)
-		out.RawText((in.ParentId).MarshalText())
+		out.Uint64(uint64(in.ParentId))
 	}
 	{
 		const prefix string = ",\"EnqueueTime\":"
@@ -933,7 +929,7 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel1(out *jw
 	}
 	out.RawByte('}')
 }
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel(in *jlexer.Lexer, out *model.Question) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverModel(in *jlexer.Lexer, out *model.Question) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -968,7 +964,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel(in *jlex
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel(out *jwriter.Writer, in model.Question) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverModel(out *jwriter.Writer, in model.Question) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -989,7 +985,7 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverModel(out *jwr
 	}
 	out.RawByte('}')
 }
-func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson6(in *jlexer.Lexer, out *Message) {
+func easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson6(in *jlexer.Lexer, out *Message) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1132,7 +1128,7 @@ func easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 		in.Consumed()
 	}
 }
-func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson6(out *jwriter.Writer, in Message) {
+func easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson6(out *jwriter.Writer, in Message) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1261,23 +1257,23 @@ func easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJ
 // MarshalJSON supports json.Marshaler interface
 func (v Message) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson6(&w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson6(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Message) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonC80ae7adEncodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson6(w, v)
+	easyjsonC80ae7adEncodeGithubComDNSMSMTINETYodnsResolverSerializationJson6(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Message) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson6(&r, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson6(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Message) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonC80ae7adDecodeGitlabMpiKlsbMpgDeFsteurerYodnsResolverSerializationJson6(l, v)
+	easyjsonC80ae7adDecodeGithubComDNSMSMTINETYodnsResolverSerializationJson6(l, v)
 }

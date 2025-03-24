@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/client/internal"
+	"github.com/godruoyi/go-snowflake"
+	"github.com/miekg/dns"
 	"golang.org/x/sync/semaphore"
 	"io"
 	"math"
@@ -15,9 +17,6 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
-
-	"github.com/google/uuid"
-	"github.com/miekg/dns"
 )
 
 var errWrittenTooManyBytes = fmt.Errorf("written more bytes than there are in the message")
@@ -43,7 +42,7 @@ type PooledConn struct {
 	*internal.MessageIdGenerator
 
 	// ID is the unique identifier of the connection.
-	ID uuid.UUID
+	ID uint64
 
 	// DestinationIP is the address of the name server to which the connection is established.
 	DestinationIP client.Address
@@ -88,7 +87,7 @@ type errWrap struct {
 func newPooledConn(destinationAddress client.Address, destinationPort uint16) *PooledConn {
 	return &PooledConn{
 		MessageIdGenerator: internal.NewIdGen(),
-		ID:                 uuid.New(),
+		ID:                 snowflake.ID(),
 		DestinationIP:      destinationAddress,
 		DestinationPort:    destinationPort,
 		writeMu:            semaphore.NewWeighted(1),

@@ -3,10 +3,10 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/cobra"
 	"github.com/DNS-MSMT-INET/yodns/resolver"
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	"github.com/DNS-MSMT-INET/yodns/resolver/serialization"
+	"github.com/spf13/cobra"
 	"math"
 	"math/rand"
 	"net/netip"
@@ -113,7 +113,7 @@ var ExtractMessages = &cobra.Command{
 		}
 
 		if cmd.Flag("correlationId").Changed {
-			ids := Must(cmd.Flags().GetStringSlice("correlationId"))
+			ids := Must(cmd.Flags().GetUintSlice("correlationId"))
 			msgFilters = append(msgFilters, CorrelationIDFilter(ids))
 		}
 
@@ -229,7 +229,7 @@ func init() {
 
 	ExtractMessages.Flags().String("from", "", "")
 	ExtractMessages.Flags().String("to", "", "")
-	ExtractMessages.Flags().StringSlice("correlationId", []string{}, "CorrelationId(s) to extract.")
+	ExtractMessages.Flags().UintSlice("correlationId", []uint{}, "CorrelationId(s) to extract.")
 	ExtractMessages.Flags().StringSlice("rcode", []string{}, "Rcode(s) to extract.")
 	ExtractMessages.Flags().StringSlice("nsIp", []string{}, "")
 	ExtractMessages.Flags().StringSlice("errorCode", []string{}, "")

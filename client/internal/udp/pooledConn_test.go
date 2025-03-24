@@ -2,10 +2,9 @@ package udp
 
 import (
 	"errors"
-	"github.com/google/uuid"
-	"github.com/miekg/dns"
 	"github.com/DNS-MSMT-INET/yodns/client/internal"
 	"github.com/DNS-MSMT-INET/yodns/client/internal/test"
+	"github.com/miekg/dns"
 	"net"
 	"reflect"
 	"strings"
@@ -27,7 +26,7 @@ func TestPooledUDPConn_ReceiveError_ExpectFaultyAndClose(t *testing.T) {
 	}
 
 	conn := newPooledUDPConn(512, false, inner)
-	conn.StartReceiving(func(u uuid.UUID, msg *dns.Msg, s string, err error) {
+	conn.StartReceiving(func(u uint64, msg *dns.Msg, s string, err error) {
 
 	})
 	time.Sleep(10 * time.Millisecond)
@@ -181,7 +180,7 @@ func TestPooledUDPConn_ReadMessage_OutOfOrder(t *testing.T) {
 		var firstReceivedResponse *dns.Msg
 		var secondReceivedResponse *dns.Msg
 		var receivedErr error
-		onReceive := func(connId uuid.UUID, msg *dns.Msg, addr string, err error) {
+		onReceive := func(connId uint64, msg *dns.Msg, addr string, err error) {
 			if err != nil {
 				receivedErr = err
 			}

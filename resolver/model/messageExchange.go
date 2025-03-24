@@ -1,9 +1,8 @@
 package model
 
 import (
-	"github.com/google/uuid"
-	"github.com/miekg/dns"
 	"github.com/DNS-MSMT-INET/yodns/client"
+	"github.com/miekg/dns"
 	"net/netip"
 	"time"
 )
@@ -30,11 +29,11 @@ type MessageExchange struct {
 type Metadata struct {
 	FromCache     bool
 	RetryIdx      uint
-	ConnId        string
+	ConnId        uint64
 	TCP           bool
 	IsFinal       bool
-	CorrelationId uuid.UUID
-	ParentId      uuid.UUID
+	CorrelationId uint64
+	ParentId      uint64
 	EnqueueTime   time.Time
 	DequeueTime   time.Time
 	RTT           time.Duration
