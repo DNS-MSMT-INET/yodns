@@ -56,6 +56,36 @@ func TestReader_CanReadPublishedFileFormat(t *testing.T) {
 		}
 
 		if !result.Domains[0].Name.EqualString("gbfmag.com.") {
+			t.Errorf("Expected the file to contain 'gbfmag.com.', found %v", result.Domains[0].Name)
+		}
+
+		iter := result.Msgs.Iterate()
+		if iter.Next().Metadata.CorrelationId == 0 {
+			t.Errorf("Expected the CorrelationId to be non-zero.")
+		}
+	}
+}
+
+// TestReader_CanReadSnowflakeFileFormat tests if the reader can read the file format
+// that uses snowflake ids instead of UUIDs to reduce file size.
+func TestReader_CanReadSnowflakeFileFormat(t *testing.T) {
+	zip := serialization.ZipZSTD
+	r, _ := NewFileReader("testdata/example.org.commit=e1de186.pb.zst")
+	r.Zip = &zip
+
+	out := make(chan resolver.Result)
+	go func() {
+		if err := r.ReadTo(out); err != nil {
+			panic(err)
+		}
+	}()
+
+	for result := range out {
+		if len(result.Domains) == 0 {
+			t.Errorf("Expected the file to contain 'example.org.', found empty array")
+		}
+
+		if !result.Domains[0].Name.EqualString("example.org.") {
 			t.Errorf("Expected the file to contain 'example.org.', found %v", result.Domains[0].Name)
 		}
 
