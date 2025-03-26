@@ -3,10 +3,10 @@ package internal
 import (
 	"context"
 	"errors"
-	"github.com/google/uuid"
-	"github.com/rs/zerolog"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/client/internal/test"
+	"github.com/godruoyi/go-snowflake"
+	"github.com/rs/zerolog"
 	"net/netip"
 	"testing"
 	"time"
@@ -20,7 +20,7 @@ func TestRateLimitingClient_Enqueue_RateLimitInflight(t *testing.T) {
 
 	// Call it one more time than allowed.
 	for i := 0; i < maxAllowedCalls+1; i++ {
-		go c.Enqueue(uuid.New(), client.Question{}, nsIP, client.SendOpts{})
+		go c.Enqueue(snowflake.ID(), client.Question{}, nsIP, client.SendOpts{})
 	}
 
 	// After 50ms, the calls from the inner c have not returned yet.
@@ -52,7 +52,7 @@ func TestRateLimitingClient_Enqueue_RateLimitPerSecond(t *testing.T) {
 
 	// Call it one more time than allowed.
 	for i := 0; i < tokenBucketSize+maxAllowedCalls; i++ {
-		go c.Enqueue(uuid.New(), client.Question{}, nsIP, client.SendOpts{})
+		go c.Enqueue(snowflake.ID(), client.Question{}, nsIP, client.SendOpts{})
 	}
 
 	// After 50ms, the calls from the inner c have not returned yet.
@@ -88,12 +88,12 @@ func TestRateLimitingClient_Enqueue_RateLimitPerSecond_FailEarly(t *testing.T) {
 
 	// Call it three times to fill the rate-limiter
 	for i := 0; i < 7; i++ { // Remember the token bucket size
-		go c.Enqueue(uuid.New(), client.Question{}, nsIP, client.SendOpts{})
+		go c.Enqueue(snowflake.ID(), client.Question{}, nsIP, client.SendOpts{})
 	}
 	time.Sleep(time.Millisecond)
 
 	start := time.Now()
-	c.Enqueue(uuid.New(), client.Question{}, nsIP, client.SendOpts{})
+	c.Enqueue(snowflake.ID(), client.Question{}, nsIP, client.SendOpts{})
 	resp := <-c.ResponseChan()
 	duration := time.Since(start)
 
@@ -112,12 +112,12 @@ func TestRateLimitingClient_Enqueue_IsBlocking(t *testing.T) {
 
 	nsIP := new(test.MockAddr).NewRandom()
 
-	go c.Enqueue(uuid.New(), client.Question{}, nsIP, client.SendOpts{})
+	go c.Enqueue(snowflake.ID(), client.Question{}, nsIP, client.SendOpts{})
 	time.Sleep(time.Millisecond) // Make sure the go routine has called before continuing
 
 	// second call should be blocked
 	start := time.Now()
-	c.Enqueue(uuid.New(), client.Question{}, nsIP, client.SendOpts{})
+	c.Enqueue(snowflake.ID(), client.Question{}, nsIP, client.SendOpts{})
 	duration := time.Since(start)
 
 	if 180*time.Millisecond > duration || 220*time.Millisecond < duration {
@@ -130,7 +130,7 @@ func TestRateLimitingClient_Enqueue_UnsolicitedMessage(t *testing.T) {
 	c := NewClient(&mock, 1, 1, time.Second, zerolog.Logger{}).Start(context.Background())
 
 	expectedResponse := client.Response{
-		CorrelationId: uuid.Nil,
+		CorrelationId: 0,
 		NameServerIP:  netip.MustParseAddr("1.2.3.4"),
 	}
 	mock.RespChan <- expectedResponse
@@ -147,7 +147,7 @@ func getMock(sleepBeforeReturn time.Duration) test.MockClient {
 		RespChan: make(chan client.Response, 1),
 	}
 
-	c.ExchangeFunc = func(correlationId uuid.UUID, q client.Question, ip client.Address, sendOpts client.SendOpts) {
+	c.ExchangeFunc = func(correlationId uint64, q client.Question, ip client.Address, sendOpts client.SendOpts) {
 		time.AfterFunc(sleepBeforeReturn, func() {
 			c.RespChan <- client.Response{
 				CorrelationId: correlationId,

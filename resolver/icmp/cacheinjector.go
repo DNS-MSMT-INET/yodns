@@ -60,7 +60,7 @@ var icmpIPV4 = icmpParams{
 			return nil, err
 		}
 
-		return hdr.Dst, nil
+		return hdr.Dst.To4(), nil
 	},
 }
 

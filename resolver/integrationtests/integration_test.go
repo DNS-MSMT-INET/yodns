@@ -11,6 +11,7 @@ import (
 	qmin2 "github.com/DNS-MSMT-INET/yodns/resolver/qmin"
 	"math"
 	"net"
+	"net/netip"
 	"strings"
 	"sync"
 	"testing"
@@ -30,12 +31,12 @@ var rootServers = []resolver2.NameServerSeed{
 }
 
 func Test_RespectsDoNotScanList(t *testing.T) {
-	aIP := netip.Addr{}.MustParse("2001:500:8f::53")
-	cIP := netip.Addr{}.MustParse("199.43.134.53")
+	aIP := netip.MustParseAddr("2001:500:8f::53")
+	cIP := netip.MustParseAddr("199.43.134.53")
 
-	input := strings.NewReader("\nIP,2001:500:8f::53" + // a.iana-servers.net
-		"\nPREFIX,199.43.134.0/24" + // prefix of c.iana-servers.net
-		"\nDN,b.iana-servers.net")
+	input := strings.NewReader("\n2001:500:8f::53" + // a.iana-servers.net
+		"\n199.43.134.0/24" + // prefix of c.iana-servers.net
+		"\nb.iana-servers.net")
 	if err := resolver2.DoNotScanList.FromReader(input); err != nil {
 		t.Errorf("doNotScanListWrapper.FromReader() error = %v", err)
 		t.FailNow()

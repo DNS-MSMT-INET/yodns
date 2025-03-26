@@ -2,9 +2,9 @@ package internal
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/client/internal/test"
+	"github.com/godruoyi/go-snowflake"
 	"reflect"
 	"testing"
 	"time"
@@ -44,7 +44,7 @@ func TestConnectionReusingClient_Enqueue(t *testing.T) {
 			sendOpts := client.SendOpts{
 				UseTCP: tt.useTCP,
 			}
-			reusingClient.Enqueue(uuid.New(), client.Question{}, new(test.MockAddr), sendOpts)
+			reusingClient.Enqueue(snowflake.ID(), client.Question{}, new(test.MockAddr), sendOpts)
 
 			if udpClient.ReceivedCalls != tt.wantUDPCalls {
 				t.Errorf("Expected %v calls to UDP, got %v", udpClient.ReceivedCalls, tt.wantUDPCalls)
@@ -67,10 +67,10 @@ func TestConnectionReusingClient_FanIn(t *testing.T) {
 	}
 
 	udpResp := client.Response{
-		CorrelationId: uuid.New(),
+		CorrelationId: snowflake.ID(),
 	}
 	tcpResp := client.Response{
-		CorrelationId: uuid.New(),
+		CorrelationId: snowflake.ID(),
 	}
 
 	udpClient.RespChan <- udpResp

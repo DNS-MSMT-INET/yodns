@@ -1,8 +1,6 @@
 package integrationtests
 
 import (
-	"github.com/miekg/dns"
-	"github.com/rs/zerolog"
 	"github.com/DNS-MSMT-INET/yodns/client"
 	"github.com/DNS-MSMT-INET/yodns/client/builder"
 	resolver2 "github.com/DNS-MSMT-INET/yodns/resolver"
@@ -10,9 +8,12 @@ import (
 	"github.com/DNS-MSMT-INET/yodns/resolver/common"
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	qmin2 "github.com/DNS-MSMT-INET/yodns/resolver/qmin"
+	"github.com/miekg/dns"
+	"github.com/rs/zerolog"
 	"golang.org/x/exp/slices"
 	"math"
 	"net"
+	"net/netip"
 	"strings"
 	"testing"
 	"time"
@@ -221,7 +222,7 @@ func Test_AsksLateDiscoveredIPs(t *testing.T) {
 	// No test domain to verify that, so we just delete one specific IP from all referrals
 	domainName := model.MustNewDomainName("google.com.")
 	authNS := model.MustNewDomainName("ns1.google.com.")
-	authNSIP := net.ParseIP("216.239.32.10")
+	authNSIP := netip.MustParseAddr("216.239.32.10")
 
 	m := qmin2.Module{
 		// Removes the glue from responses from one of the parent NSes
@@ -229,7 +230,8 @@ func Test_AsksLateDiscoveredIPs(t *testing.T) {
 			idx := 0
 			for i, rr := range msgEx.Message.Extra {
 				if aRec, ok := rr.(*dns.A); ok {
-					if aRec.A.Equal(authNSIP) {
+					a, _ := netip.AddrFromSlice(aRec.A)
+					if a == authNSIP {
 						idx = i
 					}
 				}
@@ -251,23 +253,23 @@ func Test_AsksLateDiscoveredIPs(t *testing.T) {
 	}
 
 	q = model.Ask(authNS, client.TypeAAAA)
-	if _, ok := findMessageWithIP(result, netip.Addr{}.From(authNSIP), q); !ok {
+	if _, ok := findMessageWithIP(result, authNSIP, q); !ok {
 		t.Errorf("Expected %v to be asked to %v", q, authNSIP)
 	}
 	q = model.Ask(authNS, client.TypeA)
-	if _, ok := findMessageWithIP(result, netip.Addr{}.From(authNSIP), q); !ok {
+	if _, ok := findMessageWithIP(result, authNSIP, q); !ok {
 		t.Errorf("Expected %v to be asked to %v", q, authNSIP)
 	}
 	q = model.Ask(domainName, client.TypeAAAA)
-	if _, ok := findMessageWithIP(result, netip.Addr{}.From(authNSIP), q); !ok {
+	if _, ok := findMessageWithIP(result, authNSIP, q); !ok {
 		t.Errorf("Expected %v to be asked to %v", q, authNSIP)
 	}
 	q = model.Ask(authNS, client.TypeA)
-	if _, ok := findMessageWithIP(result, netip.Addr{}.From(authNSIP), q); !ok {
+	if _, ok := findMessageWithIP(result, authNSIP, q); !ok {
 		t.Errorf("Expected %v to be asked to %v", q, authNSIP)
 	}
 	q = model.Ask(authNS, client.TypeNS)
-	if _, ok := findMessageWithIP(result, netip.Addr{}.From(authNSIP), q); !ok {
+	if _, ok := findMessageWithIP(result, authNSIP, q); !ok {
 		t.Errorf("Expected %v to be asked to %v", q, authNSIP)
 	}
 }
@@ -455,8 +457,7 @@ func Test_AsksForParentAndChildNSSet(t *testing.T) {
 	domainName := model.MustNewDomainName("example.org.")
 
 	strategy := qmin2.New().
-		AddModule(qmin2.QTModule(ipQuestionTemplates, nil)).
-		BootstrapRootZone(true)
+		AddModule(qmin2.QTModule(ipQuestionTemplates, nil))
 
 	result := resolveDomainName(domainName, strategy, false)
 
