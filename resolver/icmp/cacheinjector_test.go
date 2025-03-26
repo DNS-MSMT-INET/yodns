@@ -7,6 +7,7 @@ import (
 	"github.com/DNS-MSMT-INET/yodns/resolver/common"
 	"golang.org/x/net/icmp"
 	"net"
+	"net/netip"
 	"testing"
 	"time"
 )

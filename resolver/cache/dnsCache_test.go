@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	"github.com/klauspost/compress/zstd"
 	"github.com/miekg/dns"
-	"github.com/DNS-MSMT-INET/yodns/resolver/model"
 	"math"
 	"net/netip"
 	"os"
@@ -32,6 +32,9 @@ func TestDnsCache_CanSetAndGet(t *testing.T) {
 					Type:  1,
 					Class: 1,
 				},
+				Metadata: model.Metadata{
+					FromCache: true,
+				},
 			},
 			q: model.Question{ // Same question, should work
 				Name:  "test.com",
@@ -49,6 +52,9 @@ func TestDnsCache_CanSetAndGet(t *testing.T) {
 					Name:  "test.com",
 					Type:  1,
 					Class: 1,
+				},
+				Metadata: model.Metadata{
+					FromCache: true,
 				},
 			},
 			q: model.Question{ // Different question, should not be retrieved
@@ -97,6 +103,9 @@ func TestDnsCache_SetExisting_ExpectTTLUpdated(t *testing.T) {
 				},
 			},
 		},
+		Metadata: model.Metadata{
+			FromCache: true,
+		},
 	}
 
 	cache := NewDNSCache(math.MaxInt64)
@@ -135,6 +144,9 @@ func TestDnsCache_CanExpire(t *testing.T) {
 					},
 				},
 			},
+		},
+		Metadata: model.Metadata{
+			FromCache: true,
 		},
 	}
 
@@ -219,6 +231,9 @@ func TestDnsCache_DumpAndLoadCacheToBinary_ExpectExpiredItemsToBeRemoved(t *test
 				},
 			},
 		},
+		Metadata: model.Metadata{
+			FromCache: true,
+		},
 	}
 
 	cache := NewDNSCache(math.MaxInt64)
@@ -250,6 +265,9 @@ func TestDnsCache_DumpAndLoadCacheToBinary_ExpectLateItemsToBeRemoved(t *testing
 					},
 				},
 			},
+		},
+		Metadata: model.Metadata{
+			FromCache: true,
 		},
 	}
 
@@ -284,6 +302,9 @@ func getMessage(domainName model.DomainName) model.MessageExchange {
 					Qclass: 1,
 				},
 			},
+		},
+		Metadata: model.Metadata{
+			FromCache: true,
 		},
 	}
 }

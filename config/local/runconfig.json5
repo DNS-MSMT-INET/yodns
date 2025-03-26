@@ -16,7 +16,7 @@
 	},
 	"Output": {
 		"FileSize": 200,
-		"Format": "json",
+		"Format": "protobuf",
 		"Zip": "zst:fast",
 		"Path": "data",
 		"ParallelFiles": 1

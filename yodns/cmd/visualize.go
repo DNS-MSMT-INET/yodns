@@ -3,10 +3,10 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"github.com/miekg/dns"
-	"github.com/spf13/cobra"
 	"github.com/DNS-MSMT-INET/yodns/resolver"
 	"github.com/DNS-MSMT-INET/yodns/resolver/model"
+	"github.com/miekg/dns"
+	"github.com/spf13/cobra"
 	"io"
 	"os"
 	"path"
@@ -44,7 +44,7 @@ var Visualize = &cobra.Command{
 }
 
 func visualizeResult(result resolver.Result, outDirectory string, noMx bool, noNS bool) {
-	outFilePath := path.Join(outDirectory, toPath(result.Domains[0].Name), ".dot")
+	outFilePath := path.Join(outDirectory, toPath(result.Domains[0].Name)+".dot")
 	outFile := Must(os.Create(outFilePath))
 	defer outFile.Close()
 

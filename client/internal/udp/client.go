@@ -102,7 +102,7 @@ func (c *Client) Enqueue(correlationId uint64, q client.Question, ip client.Addr
 	msg.Id = conn.GetFreeMessageID()
 
 	key := inflightKey{
-		connId: snowflake.ID(),
+		connId: conn.Id,
 		msgId:  msg.Id,
 	}
 
