@@ -524,6 +524,8 @@ func (opts Options) InitModules() (result []qmin2.Module) {
 
 	for _, mod := range opts.Modules {
 		switch strings.ToLower(mod) {
+		case "https":
+			result = append(result, qmin2.HTTPSModule())
 		default:
 			panic(fmt.Errorf("unkown module '%v'", mod))
 		}
