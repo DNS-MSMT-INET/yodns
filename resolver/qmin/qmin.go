@@ -363,7 +363,7 @@ func getNextQNames(job *resolver.ResolutionJob, qName model.DomainName) map[mode
 	return nextQNames
 }
 
-func enrichLog(log zerolog.Logger, originalQName model.DomainName, ns *model.NameServer, msgExchange model.MessageExchange) zerolog.Logger {
+func enrichLog(log *zerolog.Logger, originalQName model.DomainName, ns *model.NameServer, msgExchange model.MessageExchange) zerolog.Logger {
 	logCtx := log.With().
 		Str("fqdn", string(originalQName)).
 		Str("ip", msgExchange.NameServerIP.String()).

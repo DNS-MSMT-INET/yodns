@@ -649,11 +649,11 @@ func (job *ResolutionJob) EnqueueRequestIP(
 }
 
 // GetLog returns a logger for the job
-func (job *ResolutionJob) GetLog() zerolog.Logger {
+func (job *ResolutionJob) GetLog() *zerolog.Logger {
 	// By hiding job.log behind this function, we enforce that every client
 	// works on a copy of the log and cannot modify it in the job.
 	// So client's can enrich their loggers freely without worrying.
-	return job.log
+	return &job.log
 }
 
 func (job *ResolutionJob) GetClosestEncloser(domainName model.DomainName) (*model.Zone, model.DomainName) {
