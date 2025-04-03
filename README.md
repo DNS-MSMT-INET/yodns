@@ -25,6 +25,23 @@ will run a minimal experiment that resolve a domain and counts the number of dep
 To run this, you will need IPv4 and IPv6 connectivity.
 Note, that the resolution may take a while due to a conservative retry policy.
 
+# Attribution
+
+If you use yodns for your research, please cite the following paper:
+
+```bibtex
+@InProceedings{10.1007/978-3-031-85960-1_5,
+	author="Steurer, Florian and Feldmann, Anja and Fiebig, Tobias",
+	editor="Testart, Cecilia and van Rijswijk-Deij, Roland and Stiller, Burkhard",
+	title="A Tree in a Tree: Measuring Biases of Partial DNS Tree Exploration",
+	booktitle="Passive and Active Measurement",
+	year="2025",
+	publisher="Springer Nature Switzerland",
+	pages="106--136",
+	isbn="978-3-031-85960-1"
+}
+```
+
 # Project Structure 
 
 The project consists of three modules:
